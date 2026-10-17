@@ -20,8 +20,8 @@ ships two things in one install:
 ## Install
 
 ```bash
-hermes plugins install touchdesigner     # catalog name
-hermes plugins enable td                 # manifest name (kept short: see below)
+vetri plugins install touchdesigner     # catalog name
+vetri plugins enable td                 # manifest name (kept short: see below)
 ```
 
 Then, once per machine, inside TouchDesigner (2025.32280+, Windows/macOS):

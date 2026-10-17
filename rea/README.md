@@ -27,8 +27,8 @@ install ships:
 ## Install
 
 ```bash
-hermes plugins install rea        # from the Nous plugin catalog
-hermes plugins enable rea
+vetri plugins install rea        # from the Nous plugin catalog
+vetri plugins enable rea
 ```
 
 Then start a new Hermes session and ask, for example, "Use REA to inspect
@@ -116,7 +116,7 @@ capture fetches.
 `mcp.json` pins `rea-agents@6.4.0` (published 2026-10-11) and the skill is
 REA's `reverse-engineer-anything` skill from the same release tag. Bumping
 either is a commit to this repo followed by a reviewed SHA bump in the
-[hermes-agent plugin catalog](https://github.com/NousResearch/hermes-agent/tree/main/plugin-catalog).
+[Vetri plugin catalog](https://github.com/pugazh342/Agent-Vetri/tree/main/plugin-catalog).
 `@latest` is deliberately not used.
 
 ## Attribution

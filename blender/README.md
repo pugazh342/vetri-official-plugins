@@ -9,11 +9,11 @@ A portable Hermes plugin containing MCP launch configuration and a workflow skil
 ## Install
 
 ```sh
-hermes plugins install blender
-hermes plugins enable blender
+vetri plugins install blender
+vetri plugins enable blender
 ```
 
-Choose the destination profile with the global `hermes -p <profile>` option. Catalog installation by the short name `blender` becomes available only after its catalog entry is merged and published.
+Choose the destination profile with the global `vetri -p <profile>` option. Catalog installation by the short name `blender` becomes available only after its catalog entry is merged and published.
 
 ## Prerequisites
 

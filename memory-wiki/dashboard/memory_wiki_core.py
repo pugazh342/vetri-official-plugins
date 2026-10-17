@@ -1,6 +1,6 @@
 """Memory Wiki aggregation — deterministic subject/daily-log derivation over session history.
 
-Originally ``hermes_cli/memory_wiki.py`` by Abdullah Raja (@Araja119, hermes-agent PR #31244),
+Originally ``hermes_cli/memory_wiki.py`` by Abdullah Raja (@Araja119, Vetri PR #31244),
 salvaged in #89940 and moved into this standalone plugin. Stays stdlib-only: the helpers are
 deterministic heuristics over the session/message dictionaries ``hermes_state.SessionDB``
 returns (``list_sessions_rich`` / ``get_messages``); no LLM calls, no writes.
@@ -72,7 +72,7 @@ _PACKAGE_NAMES = {
     "django",
     "fastapi",
     "flask",
-    "hermes-agent",
+    "Vetri",
     "nextjs",
     "nodejs",
     "pytest",

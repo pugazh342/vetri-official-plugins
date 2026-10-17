@@ -4,7 +4,7 @@
 
 > Part of the [Hermes Official Plugins](../README.md), Nous Research's official plugins for Hermes Agent. Formerly [`NousResearch/hermes-spotify`](https://github.com/NousResearch/hermes-spotify), which is archived; this directory carries its full history.
 
-Official [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin for
+Official [Hermes Agent](https://github.com/pugazh342/Agent-Vetri) plugin for
 [Spotify](https://www.spotify.com/). It gives the agent seven tools over the Spotify Web API and adds
 a `hermes spotify` command for logging in:
 
@@ -20,7 +20,7 @@ a `hermes spotify` command for logging in:
 
 This used to be built into Hermes core. It now ships as a standalone plugin with the same toolset
 (`spotify`), tool names and schemas, env vars and stored login. **If you already used Spotify with
-Hermes, you don't need to do anything:** `hermes update` (or the first start after updating) installs
+Hermes, you don't need to do anything:** `vetri update` (or the first start after updating) installs
 and enables this plugin for you and your login keeps working. The one change is the login command:
 `hermes auth spotify` is now `hermes spotify login`.
 
@@ -29,12 +29,12 @@ and enables this plugin for you and your login keeps working. The one change is 
 From the Hermes plugin catalog:
 
 ```bash
-hermes plugins install spotify
+vetri plugins install spotify
 hermes tools enable spotify      # the toolset is opt-in
 hermes spotify login
 ```
 
-Plugins are installed per profile: use `hermes -p <profile> plugins install spotify` for another
+Plugins are installed per profile: use `vetri -p <profile> plugins install spotify` for another
 profile. The only Python dependency is `httpx`, which Hermes already ships.
 
 ## Logging in
@@ -44,7 +44,7 @@ a shared public client). `hermes spotify login` walks you through it the first t
 
 1. It opens <https://developer.spotify.com/dashboard>. Click **Create app** and use
    `http://127.0.0.1:43827/spotify/callback` as the **Redirect URI**, with **Web API** checked.
-2. Paste the app's **Client ID** at the prompt. It is saved as `HERMES_SPOTIFY_CLIENT_ID` in the
+2. Paste the app's **Client ID** at the prompt. It is saved as `VETRI_SPOTIFY_CLIENT_ID` in the
    profile's `.env`, so later logins skip this step.
 3. Approve access in the browser. Tokens are stored under `providers.spotify` in the profile's
    `auth.json` and refreshed automatically.
@@ -57,12 +57,12 @@ hermes spotify logout
 
 Over SSH, forward the callback port first (`ssh -N -L 43827:127.0.0.1:43827 user@host`) and run
 `hermes spotify login --no-browser`. See
-[OAuth over SSH](https://hermes-agent.nousresearch.com/docs/guides/oauth-over-ssh).
+[OAuth over SSH](https://pugazh342.github.io/Agent-Vetri/docs/guides/oauth-over-ssh).
 
 | Variable | Purpose |
 |---|---|
-| `HERMES_SPOTIFY_CLIENT_ID` | Your Spotify app's Client ID (the login wizard sets it) |
-| `HERMES_SPOTIFY_REDIRECT_URI` | Redirect URI, if you registered something other than the default |
+| `VETRI_SPOTIFY_CLIENT_ID` | Your Spotify app's Client ID (the login wizard sets it) |
+| `VETRI_SPOTIFY_REDIRECT_URI` | Redirect URI, if you registered something other than the default |
 
 ## Free vs Premium
 
@@ -70,16 +70,16 @@ Search, playlists, albums, library, queue reads, device lists and playback state
 account. Playback control (play, pause, skip, seek, volume, shuffle/repeat, queue add, transfer)
 needs Premium and an active Spotify Connect device: open Spotify on any phone, desktop or speaker.
 
-Full guide: <https://hermes-agent.nousresearch.com/docs/user-guide/features/spotify>
+Full guide: <https://pugazh342.github.io/Agent-Vetri/docs/user-guide/features/spotify>
 
 ## Development
 
-The tests import Hermes core, so run them with a hermes-agent checkout on `PYTHONPATH`:
+The tests import Hermes core, so run them with a Vetri checkout on `PYTHONPATH`:
 
 ```bash
-PYTHONPATH=/path/to/hermes-agent python -m pytest
+PYTHONPATH=/path/to/Vetri python -m pytest
 ```
 
 ## License
 
-MIT. Originally contributed to Hermes Agent core by @dlkakbs (NousResearch/hermes-agent#15096); maintained by Nous Research.
+MIT. Originally contributed to Hermes Agent core by @dlkakbs (NousResearch/Vetri#15096); maintained by Nous Research.

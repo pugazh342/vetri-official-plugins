@@ -3,7 +3,7 @@
 Tests real logic: state change formatting, event filtering pipeline,
 cooldown behavior, env seeding, and adapter initialization.
 
-Moved from hermes-agent core ``tests/gateway/test_homeassistant.py``.
+Moved from Vetri core ``tests/gateway/test_homeassistant.py``.
 """
 
 import errno
@@ -350,7 +350,7 @@ class TestMultiplexEndpointScope:
     """Under ``gateway.multiplex_profiles`` os.environ holds the DEFAULT profile; a secondary profile's
     HASS_TOKEN must never be posted to the default profile's HASS_URL.
 
-    Moved from hermes-agent core ``tests/gateway/test_multiplex_endpoint_identity_scope.py``."""
+    Moved from Vetri core ``tests/gateway/test_multiplex_endpoint_identity_scope.py``."""
 
     DEFAULT = {"HASS_URL": "http://default-ha.example:8123", "HASS_TOKEN": "default-ha-token"}
     SECONDARY = {"HASS_URL": "http://bot2-ha.example:8123", "HASS_TOKEN": "bot2-ha-token"}
@@ -409,7 +409,7 @@ class TestUrlWithoutScheme:
     @pytest.mark.asyncio
     async def test_connect_fails_once_with_a_named_cause(self, monkeypatch, tmp_path):
         """``ha.example.com`` used to become the WS URL ``ha.example.com/api/websocket`` and retry forever."""
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+        monkeypatch.setenv("VETRI_HOME", str(tmp_path))
         adapter = _make_adapter(url="ha.example.com")
         adapter._ws_connect = AsyncMock()
 

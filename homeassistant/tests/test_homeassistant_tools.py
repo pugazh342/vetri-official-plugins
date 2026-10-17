@@ -3,7 +3,7 @@
 Tests real logic: entity filtering, payload building, response parsing,
 handler validation, and availability gating.
 
-Moved from hermes-agent core ``tests/tools/test_homeassistant_tool.py``.
+Moved from Vetri core ``tests/tools/test_homeassistant_tool.py``.
 """
 
 import json

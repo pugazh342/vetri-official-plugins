@@ -6,7 +6,7 @@
   "author": {
     "name": "Nous Research"
   },
-  "repository": "https://github.com/NousResearch/hermes-official-plugins/tree/main/blender",
+  "repository": "https://github.com/pugazh342/vetri-official-plugins/tree/main/blender",
   "license": "MIT",
   "keywords": [
     "blender",
@@ -15,7 +15,7 @@
     "local"
   ],
   "extensions": {
-    "com.nousresearch.hermes": {
+    "com.nousresearch.vetri": {
       "servers": {
         "blender": {
           "app": {

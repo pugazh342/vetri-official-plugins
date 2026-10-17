@@ -22,8 +22,8 @@ install ships:
 ## Install
 
 ```bash
-hermes plugins install snyk       # from the Nous plugin catalog
-hermes plugins enable snyk
+vetri plugins install snyk       # from the Nous plugin catalog
+vetri plugins enable snyk
 ```
 
 Then start a new Hermes session. The skill is available as
@@ -76,13 +76,13 @@ name at 62 or less.
 
 `mcp.json` pins `snyk@1.1306.0` (published 2026-07-09). Bumping the pin is a
 commit to this repo followed by a reviewed SHA bump in the
-[hermes-agent plugin catalog](https://github.com/NousResearch/hermes-agent/tree/main/plugin-catalog).
+[Vetri plugin catalog](https://github.com/pugazh342/Agent-Vetri/tree/main/plugin-catalog).
 `@latest` is deliberately not used.
 
 ## Attribution
 
 Catalog research, tool pruning rationale and validation originate from
-[hermes-agent #73860](https://github.com/NousResearch/hermes-agent/pull/73860),
-re-homed here as a standalone plugin per the hermes-agent policy that
+[Vetri #73860](https://github.com/pugazh342/Agent-Vetri/pull/73860),
+re-homed here as a standalone plugin per the Vetri policy that
 third-party product integrations ship outside the core tree. Snyk and the
 Snyk CLI are products of Snyk Ltd. MIT.

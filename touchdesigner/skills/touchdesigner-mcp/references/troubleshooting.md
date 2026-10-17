@@ -137,15 +137,15 @@ actual = str(n.width) + 'x' + str(n.height)
 
 ### Config location
 
-`$HERMES_HOME/config.yaml` (defaults to `~/.hermes/config.yaml` when `HERMES_HOME` is unset)
+`$VETRI_HOME/config.yaml` (defaults to `~/.vetri/config.yaml` when `VETRI_HOME` is unset)
 
 ### MCP entry format
 
 The server comes from the `touchdesigner` plugin (`mcp.json` inside the plugin,
 `http://127.0.0.1:40404/mcp`, Streamable HTTP). Check it is enabled:
 ```bash
-hermes plugins list --plain | grep -w td
-hermes plugins enable td
+vetri plugins list --plain | grep -w td
+vetri plugins enable td
 ```
 If you find an old `twozero_td` or `touchdesigner` entry under `mcp_servers`
 in config.yaml (written by earlier versions of this skill), remove it — the

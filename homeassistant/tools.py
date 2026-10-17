@@ -4,7 +4,7 @@ Provides ``ha_list_entities``, ``ha_get_state``, ``ha_list_services``, ``ha_call
 ``homeassistant`` toolset. Auth is a Long-Lived Access Token (``HASS_TOKEN``); the instance URL comes
 from ``HASS_URL`` (default http://homeassistant.local:8123).
 
-Moved out of hermes-agent core (``tools/homeassistant_tool.py``) into the standalone
+Moved out of Vetri core (``tools/homeassistant_tool.py``) into the standalone
 ``hermes-homeassistant`` plugin with identical names, schemas and behaviour. Registration goes through
 the public plugin API (``register_tools(ctx)`` -> ``ctx.register_tool``) instead of ``tools.registry``.
 """

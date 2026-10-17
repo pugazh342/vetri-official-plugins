@@ -549,8 +549,8 @@ def process_workdir():
 
 
 class Client:
-    HERMES_SKIP_TRANSPORT_WRAP = True
-    HERMES_SKIP_ASYNC_WRAP = True
+    VETRI_SKIP_TRANSPORT_WRAP = True
+    VETRI_SKIP_ASYNC_WRAP = True
 
     def __init__(self, command=None, args=None, env=None, timeout=180, **_):
         # Hermes snapshots routing metadata from client-shaped objects; this is not a credential.

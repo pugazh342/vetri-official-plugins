@@ -22,7 +22,7 @@ body:
     id: versions
     attributes:
       label: Versions
-      description: Output of `hermes version` and `hermes plugins list`
+      description: Output of `vetri version` and `vetri plugins list`
       render: text
     validations:
       required: true
@@ -30,5 +30,5 @@ body:
     id: logs
     attributes:
       label: Logs
-      description: Relevant lines from `~/.hermes/logs/`. Remove tokens and personal data.
+      description: Relevant lines from `~/.vetri/logs/`. Remove tokens and personal data.
       render: text

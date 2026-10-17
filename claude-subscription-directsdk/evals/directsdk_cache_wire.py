@@ -123,7 +123,7 @@ def run(binary, model):
         peer.wires, peer.tools = [], True
         worker = threading.Thread(target=peer.serve_forever, daemon=True)
         worker.start()
-        env = {"PATH": os.defpath, "HOME": tmp, "HERMES_HOME": tmp,
+        env = {"PATH": os.defpath, "HOME": tmp, "VETRI_HOME": tmp,
                "CLAUDE_CONFIG_DIR": str(Path(tmp) / "config"), "XDG_CONFIG_HOME": tmp,
                "ANTHROPIC_API_KEY": "sk-ant-public-offline-fixture",
                "ANTHROPIC_BASE_URL": f"http://127.0.0.1:{peer.server_port}",

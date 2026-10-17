@@ -3,7 +3,7 @@
 Mounted by the Hermes web server at ``/api/plugins/memory-wiki/`` once the plugin is in
 ``plugins.enabled``. Every route opens the profile's ``state.db`` READ-ONLY through the public
 ``hermes_state.SessionDB`` API, resolves the profile at call time (the host scopes
-``?profile=`` via ``HERMES_HOME``), and never writes memory files.
+``?profile=`` via ``VETRI_HOME``), and never writes memory files.
 
 Routes:
     GET /overview                 subjects + daily logs + recent sessions + persistent-memory notes

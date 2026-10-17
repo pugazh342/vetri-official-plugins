@@ -52,7 +52,7 @@ def _resolve(command, env):
 
 
 # The plugin's settings live at plugins.entries.<manifest name>.settings in the active profile's
-# config.yaml (plugin.yaml `config_schema`; Desktop → Capabilities → Plugins, or `hermes config set`).
+# config.yaml (plugin.yaml `config_schema`; Desktop → Capabilities → Plugins, or `vetri config set`).
 PLUGIN_ID = "claude-subscription-directsdk-experimental"
 TELEMETRY_SETTING = "claude_code_telemetry"
 CONFIG_DIR_SETTING = "claude_config_dir"

@@ -2,7 +2,7 @@
 
 Requires aiohttp, HASS_TOKEN (Long-Lived Access Token) and HASS_URL (default http://homeassistant.local:8123).
 
-Moved out of hermes-agent core (``plugins/platforms/homeassistant/adapter.py``) into the standalone
+Moved out of Vetri core (``plugins/platforms/homeassistant/adapter.py``) into the standalone
 ``hermes-homeassistant`` plugin; behaviour is unchanged. Registration lives in the package ``__init__``.
 """
 
@@ -89,7 +89,7 @@ def _connect_error_detail(exc: BaseException) -> str:
         return (
             f"{text} — macOS Local Network Privacy is blocking this launchd gateway from the LAN. "
             "Run `hermes gateway install` to regenerate the launchd job, then `hermes gateway restart`. "
-            "https://github.com/NousResearch/hermes-agent/issues/71206"
+            "https://github.com/NousResearch/Vetri/issues/71206"
         )
     return text
 

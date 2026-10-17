@@ -139,7 +139,7 @@ class ClaudeOAuthDirectSDKProfile(ProviderProfile):
 
     def fetch_models(self, **kwargs):
         # No HTTP /models endpoint: the account's own picker (CLI `initialize` handshake) is the
-        # live list for /model, the Desktop picker and `hermes model`; None degrades to the catalog.
+        # live list for /model, the Desktop picker and `vetri model`; None degrades to the catalog.
         rows = self.discover_models(**kwargs)
         return [row["id"] for row in rows] if rows else None
 
@@ -225,7 +225,7 @@ profile = ClaudeOAuthDirectSDKProfile(
 )
 register_provider(profile)
 
-# The provider stays registered when Claude Code is missing so `hermes model` can show the
+# The provider stays registered when Claude Code is missing so `vetri model` can show the
 # install hint; the request path (`directsdk.Client`) refuses with the same message.
 if _found is None:
     logger.warning("%s: %s", profile.display_name, INSTALL_HINT)

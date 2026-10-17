@@ -30,7 +30,7 @@ tells you how to remediate them.
 
 ## Prerequisites
 
-- The `snyk` plugin installed and enabled (`hermes plugins install snyk`, `hermes plugins enable snyk`,
+- The `snyk` plugin installed and enabled (`vetri plugins install snyk`, `vetri plugins enable snyk`,
   then a NEW Hermes session so the MCP tools load). The server is launched with
   `npx -y snyk@<pinned> mcp -t stdio --profile full --DISABLE_ANALYTICS`, so Node.js/npm must be
   on `PATH`. Usage analytics are disabled in the manifest; the scans themselves are network calls.
@@ -117,5 +117,5 @@ finds them either way). The suffix after `__sn__` is the Snyk tool name used bel
   account before the first scan.
 - A scan on a known-vulnerable fixture (e.g. `npm init -y && npm i lodash@4.17.15`) reports
   findings; after upgrading, the re-scan reports fewer.
-- `hermes plugins list` shows `snyk` enabled and a new session lists tools ending in
+- `vetri plugins list` shows `snyk` enabled and a new session lists tools ending in
   `__sn__snyk_code_scan`.

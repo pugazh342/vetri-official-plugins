@@ -2,7 +2,7 @@
 
 Official catalog plugin (formerly bundled with Hermes as ``observability/langfuse``).
 Activated via ``plugins.enabled``; hooks are inert without the ``langfuse`` SDK
-and credentials. Env: HERMES_LANGFUSE_PUBLIC_KEY / SECRET_KEY (required),
+and credentials. Env: VETRI_LANGFUSE_PUBLIC_KEY / SECRET_KEY (required),
 BASE_URL, ENV, RELEASE, SAMPLE_RATE, MAX_CHARS (12000), MAX_DEPTH (4), DEBUG, and CAPTURE =
 metadata (sizes/ids/usage only) | sanitized (default: secret redaction +
 truncation) | full (truncated raw content). See README.md.
@@ -76,11 +76,11 @@ _READ_FILE_META_KEYS = ("total_lines", "file_size", "truncated", "is_binary", "i
 # template value: the SDK accepts it at construction time but silently drops
 # every trace at flush time (#23823).
 _LANGFUSE_KEY_PREFIXES: dict[str, str] = {
-    "HERMES_LANGFUSE_PUBLIC_KEY": "pk-lf-",
-    "HERMES_LANGFUSE_SECRET_KEY": "sk-lf-",
+    "VETRI_LANGFUSE_PUBLIC_KEY": "pk-lf-",
+    "VETRI_LANGFUSE_SECRET_KEY": "sk-lf-",
 }
 # Right-prefix templates are placeholders too: the docs print the keys as literally
-# ``pk-lf-...`` and that paste passes the prefix check (hermes-agent#51399). Matched on the
+# ``pk-lf-...`` and that paste passes the prefix check (Vetri#51399). Matched on the
 # lowercased remainder after the prefix: whole-value for these, substring for the fragments.
 # Issued remainders are UUID-shaped hex, and every fragment has a non-hex letter.
 _PLACEHOLDER_REMAINDERS = frozenset({"", "...", "***"})
@@ -111,7 +111,7 @@ def _secret(name: str) -> str:
 
 
 def _debug(message: str) -> None:
-    if _env("HERMES_LANGFUSE_DEBUG").lower() in {"1", "true", "yes", "on"}:
+    if _env("VETRI_LANGFUSE_DEBUG").lower() in {"1", "true", "yes", "on"}:
         logger.info("Langfuse tracing: %s", message)
 
 
@@ -134,13 +134,13 @@ def _capture_mode() -> str:
     can flip modes. Invalid values warn once and fall back to the default (never
     capture more than the operator intended)."""
     global _warned_invalid_capture
-    value = _env("HERMES_LANGFUSE_CAPTURE").lower()
+    value = _env("VETRI_LANGFUSE_CAPTURE").lower()
     if not value or value in _CAPTURE_MODES:
         return value or _DEFAULT_CAPTURE_MODE
     if not _warned_invalid_capture:
         _warned_invalid_capture = True
         logger.warning(
-            "Langfuse plugin: invalid HERMES_LANGFUSE_CAPTURE=%r, falling back "
+            "Langfuse plugin: invalid VETRI_LANGFUSE_CAPTURE=%r, falling back "
             "to %r (valid: %s)",
             value, _DEFAULT_CAPTURE_MODE, ", ".join(_CAPTURE_MODES),
         )
@@ -152,7 +152,7 @@ def _redact_secrets(value: str) -> str:
     # false, this content leaves the machine), sweeps opaque ``Bearer <token>``
     # residue, and fails CLOSED — a redactor error never ships the raw text.
     # redact_url_credentials: core keeps user:pass@ / ?api_key= so OAuth callbacks
-    # survive tool flows; an upload to Langfuse has no such need (hermes-agent#88608).
+    # survive tool flows; an upload to Langfuse has no such need (Vetri#88608).
     from agent.redact import redact_for_egress, redact_sensitive_text
     return redact_for_egress(redact_sensitive_text(value, force=True, redact_url_credentials=True))
 
@@ -263,20 +263,20 @@ def _build_client() -> Optional[Langfuse]:
     if Langfuse is None:
         logger.warning(
             "Langfuse plugin is enabled but the langfuse SDK is unavailable; "
-            "tracing is disabled. Reinstall it with `hermes plugins install langfuse --force`."
+            "tracing is disabled. Reinstall it with `vetri plugins install langfuse --force`."
         )
         return None
 
-    public_key, secret_key = (_secret(f"HERMES_LANGFUSE_{n}") or _secret(f"LANGFUSE_{n}") for n in ("PUBLIC_KEY", "SECRET_KEY"))
+    public_key, secret_key = (_secret(f"VETRI_LANGFUSE_{n}") or _secret(f"LANGFUSE_{n}") for n in ("PUBLIC_KEY", "SECRET_KEY"))
     if not (public_key and secret_key):
         # Enabled but half/un-configured used to return with zero log output, so a placeholder
-        # public key with the secret unset dropped every trace silently (hermes-agent#98631).
-        missing = [name for name, value in (("HERMES_LANGFUSE_PUBLIC_KEY", public_key),
-                                            ("HERMES_LANGFUSE_SECRET_KEY", secret_key)) if not value]
+        # public key with the secret unset dropped every trace silently (Vetri#98631).
+        missing = [name for name, value in (("VETRI_LANGFUSE_PUBLIC_KEY", public_key),
+                                            ("VETRI_LANGFUSE_SECRET_KEY", secret_key)) if not value]
         logger.warning(
             "Langfuse plugin: missing credentials (%s), traces will NOT be emitted. Set both "
-            "HERMES_LANGFUSE_PUBLIC_KEY and HERMES_LANGFUSE_SECRET_KEY, or disable the plugin "
-            "(`hermes plugins disable langfuse`) to silence this warning.",
+            "VETRI_LANGFUSE_PUBLIC_KEY and VETRI_LANGFUSE_SECRET_KEY, or disable the plugin "
+            "(`vetri plugins disable langfuse`) to silence this warning.",
             ", ".join(missing),
         )
         return None
@@ -284,18 +284,18 @@ def _build_client() -> Optional[Langfuse]:
     # The SDK does not validate keys at construction; placeholder keys
     # would fail silently at flush time (#23823). Warn once here instead.
     # Only Langfuse Cloud guarantees the pk-lf-/sk-lf- format: a custom endpoint may issue
-    # operator-defined keys and authenticates them itself (hermes-agent#72484), so there a wrong
+    # operator-defined keys and authenticates them itself (Vetri#72484), so there a wrong
     # prefix only warns (self-hosted Langfuse issues pk-lf-/sk-lf- too) and templates still refuse.
-    base_url = _secret("HERMES_LANGFUSE_BASE_URL") or _secret("LANGFUSE_BASE_URL") or "https://cloud.langfuse.com"
+    base_url = _secret("VETRI_LANGFUSE_BASE_URL") or _secret("LANGFUSE_BASE_URL") or "https://cloud.langfuse.com"
     host = (urlsplit(base_url).hostname or "").rstrip(".")
     cloud = host == "langfuse.com" or host.endswith(".langfuse.com")
-    keys = (("HERMES_LANGFUSE_PUBLIC_KEY", public_key), ("HERMES_LANGFUSE_SECRET_KEY", secret_key))
+    keys = (("VETRI_LANGFUSE_PUBLIC_KEY", public_key), ("VETRI_LANGFUSE_SECRET_KEY", secret_key))
     placeholder_issues = [issue for name, value in keys if (issue := _validate_langfuse_key(name, value, require_prefix=cloud))]
     if placeholder_issues:
         logger.warning(
             "Langfuse plugin: credentials look like placeholders, traces will "
             "NOT be emitted (%s). Set real Langfuse keys (pk-lf-... / sk-lf-...) "
-            "or unset HERMES_LANGFUSE_PUBLIC_KEY / HERMES_LANGFUSE_SECRET_KEY to "
+            "or unset VETRI_LANGFUSE_PUBLIC_KEY / VETRI_LANGFUSE_SECRET_KEY to "
             "silence this warning.",
             "; ".join(placeholder_issues),
         )
@@ -312,23 +312,23 @@ def _build_client() -> Optional[Langfuse]:
     kwargs: dict[str, Any] = {"public_key": public_key, "secret_key": secret_key}
     for key, name, default in (("base_url", "BASE_URL", "https://cloud.langfuse.com"), ("environment", "ENV", ""),
                                ("release", "RELEASE", "")):
-        value = _secret(f"HERMES_LANGFUSE_{name}") or _secret(f"LANGFUSE_{name}") or default
+        value = _secret(f"VETRI_LANGFUSE_{name}") or _secret(f"LANGFUSE_{name}") or default
         if value:
             kwargs[key] = value
-    sample_rate = _secret("HERMES_LANGFUSE_SAMPLE_RATE")
+    sample_rate = _secret("VETRI_LANGFUSE_SAMPLE_RATE")
     if sample_rate:
         try:
             kwargs["sample_rate"] = float(sample_rate)
         except ValueError:
-            logger.warning("Invalid HERMES_LANGFUSE_SAMPLE_RATE=%r", sample_rate)
+            logger.warning("Invalid VETRI_LANGFUSE_SAMPLE_RATE=%r", sample_rate)
 
     # The SDK's OTel resource falls back to service.name=unknown_service, so every agent's traces
-    # landed unattributed (hermes-agent#58322). Default only: an operator's OTEL_SERVICE_NAME or
+    # landed unattributed (Vetri#58322). Default only: an operator's OTEL_SERVICE_NAME or
     # service.name in OTEL_RESOURCE_ATTRIBUTES still wins. The SDK's TracerProvider reads it once at
     # construction, so it is set only for that call: children (terminal, MCP) must not inherit it.
     default_service = "OTEL_SERVICE_NAME" not in os.environ and "service.name=" not in os.environ.get("OTEL_RESOURCE_ATTRIBUTES", "")
     if default_service:
-        os.environ["OTEL_SERVICE_NAME"] = "hermes-agent"
+        os.environ["OTEL_SERVICE_NAME"] = "Vetri"
     try:
         return Langfuse(**kwargs)
     except Exception as exc:  # pragma: no cover - fail-open
@@ -436,7 +436,7 @@ def _normalize_payload(value: Any, *, tool_name: str = "", args: Any = None) -> 
 
 @functools.lru_cache(maxsize=8)
 def _resolve_max_depth(configured_depth: str) -> int:
-    """Parse ``HERMES_LANGFUSE_MAX_DEPTH``; an invalid value warns ONCE per distinct value.
+    """Parse ``VETRI_LANGFUSE_MAX_DEPTH``; an invalid value warns ONCE per distinct value.
     Cached on the raw string (not at import) so a long-lived process still picks up a changed
     env var, while a bad value no longer logs one warning per captured prompt/tool payload."""
     try:
@@ -445,15 +445,15 @@ def _resolve_max_depth(configured_depth: str) -> int:
             raise ValueError
         return max_depth
     except ValueError:
-        logger.warning("Invalid HERMES_LANGFUSE_MAX_DEPTH=%r; use a non-negative integer. Falling back to 4.", configured_depth)
+        logger.warning("Invalid VETRI_LANGFUSE_MAX_DEPTH=%r; use a non-negative integer. Falling back to 4.", configured_depth)
         return 4
 
 
 def _safe_value(value: Any, *, max_chars: Optional[int] = None, depth: int = 0,
                 parse_json_strings: bool = False, max_depth: Optional[int] = None) -> Any:
-    max_chars = max_chars if max_chars is not None else int(_env("HERMES_LANGFUSE_MAX_CHARS", "12000") or "12000")
+    max_chars = max_chars if max_chars is not None else int(_env("VETRI_LANGFUSE_MAX_CHARS", "12000") or "12000")
     if max_depth is None:
-        max_depth = _resolve_max_depth(_env("HERMES_LANGFUSE_MAX_DEPTH", "4") or "4")
+        max_depth = _resolve_max_depth(_env("VETRI_LANGFUSE_MAX_DEPTH", "4") or "4")
     if depth > max_depth:
         return "<max-depth>"
     if value is None or isinstance(value, (int, float, bool)):
@@ -630,7 +630,7 @@ def _usage_and_cost(response: Any, *, provider: str, model: str, base_url: str, 
 
 
 def _trace_tags(platform: str) -> list[str]:
-    """Stable, content-free root tags so trigger type is filterable (hermes-agent#88502):
+    """Stable, content-free root tags so trigger type is filterable (Vetri#88502):
     ``platform:<name>`` and ``trigger:cron|interactive``. A cron run also gets ``cron-job:<id>``:
     each run opens a fresh session (``cron_<job-id>_<timestamp>``), so the job id is the only stable
     handle across runs. Read from the scheduler's own ``ctx.current_cron_execution()`` rather than
@@ -658,8 +658,8 @@ def _start_root_trace(task_key: str, *, task_id: str, session_id: str, platform:
     profile = _PLUGIN_CTX.profile_name if _PLUGIN_CTX is not None else ""
     # A dispatcher-spawned kanban worker gets its board task / run id in its env, so its traces can
     # be joined back to the card without guessing from session names. Omitted outside kanban.
-    kanban = {k: v for k, v in (("kanban_task_id", _env("HERMES_KANBAN_TASK")),
-                                ("kanban_run_id", _env("HERMES_KANBAN_RUN_ID"))) if v}
+    kanban = {k: v for k, v in (("kanban_task_id", _env("VETRI_KANBAN_TASK")),
+                                ("kanban_run_id", _env("VETRI_KANBAN_RUN_ID"))) if v}
     metadata = {
         "source": "hermes", "task_id": task_id, "turn_id": turn_id, "api_request_id": api_request_id,
         "platform": platform, "provider": provider, "model": model, "api_mode": api_mode,
@@ -670,7 +670,7 @@ def _start_root_trace(task_key: str, *, task_id: str, session_id: str, platform:
 
     # Detached start_observation(), not start_as_current_observation(): the "current" variant pushes an OTEL
     # contextvars token that must be popped in the same context it was pushed in, but the root span is ended by
-    # a later hook on another worker thread, so every turn logged "Failed to detach context" (hermes-agent#95057). A span
+    # a later hook on another worker thread, so every turn logged "Failed to detach context" (Vetri#95057). A span
     # created inside propagate_attributes still carries its session / trace name / tags.
     def open_root():
         return client.start_observation(trace_context=trace_ctx, name="Hermes turn", as_type="chain",
@@ -690,7 +690,7 @@ def _start_root_trace(task_key: str, *, task_id: str, session_id: str, platform:
         root_span = open_root()
 
     # Trace-level I/O: set_trace_io() in the pinned SDK v4 (v3's update_trace() is gone, and
-    # calling it failed open on every turn, leaving traces without input/output: hermes-agent#94710).
+    # calling it failed open on every turn, leaving traces without input/output: Vetri#94710).
     with _failsafe("set_trace_io(input)"):
         root_span.set_trace_io(input=trace_input)
 
@@ -704,7 +704,7 @@ def _start_child_observation(state: TraceState, *, name: str, as_type: str, inpu
     # propagate_attributes() only stamps observations created inside its scope, and children are
     # created by later hooks (often on another thread), so re-enter it per child; otherwise every
     # generation/tool span carries no session_id/tags and observation-level analytics bucket all
-    # tokens and cost under a null session (hermes-agent#81730).
+    # tokens and cost under a null session (Vetri#81730).
     with propagate_attributes(**state.propagated) if propagate_attributes and state.propagated \
             else contextlib.nullcontext():
         return state.root_span.start_observation(name=name, as_type=as_type, input=input_value,

@@ -43,8 +43,8 @@ This skill ships inside the `touchdesigner` Hermes plugin together with the MCP
 server entry. Install and enable the plugin from the Nous plugin catalog:
 
 ```bash
-hermes plugins install touchdesigner   # catalog name
-hermes plugins enable td               # plugin (manifest) name
+vetri plugins install touchdesigner   # catalog name
+vetri plugins enable td               # plugin (manifest) name
 ```
 
 Enabling the plugin registers the twozero MCP server (`http://127.0.0.1:40404/mcp`)
@@ -80,7 +80,7 @@ nc -z 127.0.0.1 40404 && echo "twozero MCP: READY"
 
 > Migrating from the old manual setup: earlier versions of this skill wrote a
 > `twozero_td` entry into `mcp_servers` (or `hermes mcp install touchdesigner`
-> wrote a `touchdesigner` entry). Remove those from `~/.hermes/config.yaml` so
+> wrote a `touchdesigner` entry). Remove those from `~/.vetri/config.yaml` so
 > the server isn't loaded twice under two names.
 
 ## Environment Notes

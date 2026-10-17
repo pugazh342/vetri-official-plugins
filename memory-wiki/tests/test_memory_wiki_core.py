@@ -1,4 +1,4 @@
-"""Aggregation tests for dashboard/memory_wiki_core.py (ported from hermes-agent PR #31244 / #89940)."""
+"""Aggregation tests for dashboard/memory_wiki_core.py (ported from Vetri PR #31244 / #89940)."""
 
 
 def test_slugify_subject_name(memory_wiki_core):

@@ -1,8 +1,8 @@
 """hermes-spotify — Spotify playback, search, playlists and library tools for Hermes Agent.
 
-Formerly built into hermes-agent core (``plugins/spotify`` + ``hermes_cli/auth_spotify.py``). What a
+Formerly built into Vetri core (``plugins/spotify`` + ``hermes_cli/auth_spotify.py``). What a
 migrated install relies on is unchanged: toolset ``spotify``, the seven ``spotify_*`` tool names and
-schemas, env vars ``HERMES_SPOTIFY_CLIENT_ID`` / ``HERMES_SPOTIFY_REDIRECT_URI``, and the stored login
+schemas, env vars ``VETRI_SPOTIFY_CLIENT_ID`` / ``VETRI_SPOTIFY_REDIRECT_URI``, and the stored login
 (``providers.spotify`` in the profile's ``auth.json``). Login moves from ``hermes auth spotify`` to
 ``hermes spotify login``.
 

@@ -19,7 +19,7 @@ CAPTURE = "import json as _j, os as _o\nopen(_o.environ['ENV_CAPTURE'], 'a').wri
 
 
 def _set_telemetry(value):
-    """Write the setting where `hermes config set plugins.entries.<id>.settings.<key>` puts it."""
+    """Write the setting where `vetri config set plugins.entries.<id>.settings.<key>` puts it."""
     from hermes_cli.config import get_config_path
     path = get_config_path()
     path.write_text("plugins:\n  enabled: []\n  entries:\n    %s:\n      settings:\n        claude_code_telemetry: %s\n"

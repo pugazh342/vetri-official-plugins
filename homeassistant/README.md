@@ -4,7 +4,7 @@
 
 > Part of the [Hermes Official Plugins](../README.md), Nous Research's official plugins for Hermes Agent. Formerly [`NousResearch/hermes-homeassistant`](https://github.com/NousResearch/hermes-homeassistant), which is archived; this directory carries its full history.
 
-Official [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin for
+Official [Hermes Agent](https://github.com/pugazh342/Agent-Vetri) plugin for
 [Home Assistant](https://www.home-assistant.io/). It provides two things:
 
 1. **Gateway platform `homeassistant`**: subscribes to Home Assistant's WebSocket event bus and
@@ -17,7 +17,7 @@ Official [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin for
 
 This used to be built into Hermes core. It now ships as a standalone plugin with the same platform
 name, toolset, tool names and schemas, env vars and config keys. **If you already used Home
-Assistant with Hermes, you don't need to change anything:** `hermes update` (or the first start
+Assistant with Hermes, you don't need to change anything:** `vetri update` (or the first start
 after updating) installs and enables this plugin for you.
 
 ## Install
@@ -25,7 +25,7 @@ after updating) installs and enables this plugin for you.
 From the Hermes plugin catalog:
 
 ```bash
-hermes plugins install homeassistant
+vetri plugins install homeassistant
 ```
 
 The plugin's only Python dependency is `aiohttp` (`>=3.9,<4`, resolved under Hermes's own pins). It
@@ -43,7 +43,7 @@ needs a Hermes Agent release of `0.21.5` or newer.
 ### 2. Environment variables
 
 ```bash
-# ~/.hermes/.env
+# ~/.vetri/.env
 
 # Required: your Long-Lived Access Token
 HASS_TOKEN=your-long-lived-access-token
@@ -75,7 +75,7 @@ hermes gateway
 
 By default, **no events are forwarded**. Configure at least one of `watch_domains`, `watch_entities`
 or `watch_all`, otherwise a warning is logged at startup and every state change is dropped. Settings
-go under the platform's `extra` section in `~/.hermes/config.yaml`:
+go under the platform's `extra` section in `~/.vetri/config.yaml`:
 
 ```yaml
 platforms:
@@ -130,10 +130,10 @@ WebSocket) using your `HASS_TOKEN`. It stores no state and sends no telemetry.
 
 ## Development
 
-Tests need a hermes-agent checkout on `PYTHONPATH` plus `pytest` and `pytest-asyncio`:
+Tests need a Vetri checkout on `PYTHONPATH` plus `pytest` and `pytest-asyncio`:
 
 ```bash
-PYTHONPATH=/path/to/hermes-agent python -m pytest tests -q
+PYTHONPATH=/path/to/Vetri python -m pytest tests -q
 ```
 
 ## License

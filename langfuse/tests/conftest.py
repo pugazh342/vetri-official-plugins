@@ -4,7 +4,7 @@ The Hermes plugin loader imports a directory plugin as a package (``hermes_plugi
 a stable alias instead (``langfuse`` itself is the SDK's name). Many tests drop the module from
 ``sys.modules`` and import it again for a clean client cache, so the alias is served by a meta-path
 finder rather than loaded once. Hermes core (``agent``, ``hermes_cli``) must be importable — run with a
-hermes-agent checkout on ``PYTHONPATH``.
+Vetri checkout on ``PYTHONPATH``.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ if not any(isinstance(f, _PluginFinder) for f in sys.meta_path):
 @pytest.fixture(autouse=True)
 def _hermes_home(tmp_path, monkeypatch):
     """Every test gets its own profile home, so nothing reads the developer's real config or .env."""
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+    monkeypatch.setenv("VETRI_HOME", str(tmp_path / "hermes"))
     (tmp_path / "hermes").mkdir()
 
 

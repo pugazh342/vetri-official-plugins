@@ -64,7 +64,7 @@ def test_core_finds_a_cli_that_is_only_in_an_install_prefix(tmp_path, monkeypatc
     shutil.copytree(root, home / "plugins" / "claude-subscription-directsdk-experimental",
                     ignore=shutil.ignore_patterns(".git", "tests", "evals", "__pycache__"))
     (home / "config.yaml").write_text("plugins:\n  enabled: []\n", encoding="utf-8")
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("VETRI_HOME", str(home))
     for name in tuple(sys.modules):
         if name.startswith("_hermes_user_provider_"):
             monkeypatch.delitem(sys.modules, name)

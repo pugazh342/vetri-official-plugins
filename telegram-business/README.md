@@ -4,7 +4,7 @@
 
 > Part of [Hermes Official Plugins](../README.md), Nous Research's official plugins for Hermes Agent. Formerly [`NousResearch/hermes-telegram-business`](https://github.com/NousResearch/hermes-telegram-business), which is archived; this directory carries its full history.
 
-**Observe-with-approval Telegram Business Mode (secretary bot) for [Hermes Agent](https://github.com/NousResearch/hermes-agent).**
+**Observe-with-approval Telegram Business Mode (secretary bot) for [Hermes Agent](https://github.com/pugazh342/Agent-Vetri).**
 
 Connect your Telegram Business account to your Hermes bot and it becomes your secretary: every incoming customer message gets an LLM-drafted reply delivered to **your** DM with inline buttons — **nothing reaches the customer until you tap Send.**
 
@@ -35,7 +35,7 @@ Discard → dropped, the customer sees nothing
 
 ## Requirements
 
-- Hermes Agent with plugin Telegram-handler support (`ctx.register_telegram_handler`, hermes-agent PR #59159 / v0.18+)
+- Hermes Agent with plugin Telegram-handler support (`ctx.register_telegram_handler`, Vetri PR #59159 / v0.18+)
 - A Telegram **Business** subscription on your personal account
 - Your Hermes Telegram bot with **Business Mode** toggled on in [@BotFather](https://t.me/BotFather)
 - python-telegram-bot ≥ 21.1 (already installed with the Hermes Telegram platform)
@@ -43,9 +43,9 @@ Discard → dropped, the customer sees nothing
 ## Install
 
 ```bash
-git clone https://github.com/NousResearch/hermes-official-plugins/tree/main/telegram-business \
-    ~/.hermes/plugins/telegram-business
-hermes plugins enable telegram-business
+git clone https://github.com/pugazh342/vetri-official-plugins/tree/main/telegram-business \
+    ~/.vetri/plugins/telegram-business
+vetri plugins enable telegram-business
 ```
 
 Restart the gateway (`hermes gateway restart`). Then:
@@ -64,7 +64,7 @@ Restart the gateway (`hermes gateway restart`). Then:
 
 ## Configuration
 
-Optional block in `~/.hermes/config.yaml`:
+Optional block in `~/.vetri/config.yaml`:
 
 ```yaml
 plugins:
@@ -82,7 +82,7 @@ Drafting uses your active Hermes model through the host-owned plugin LLM surface
 
 ## State
 
-Plugin-owned SQLite at `~/.hermes/telegram-business/state.db` (two tables: connections + drafts). Hermes' core state is never touched. Delete the file to reset.
+Plugin-owned SQLite at `~/.vetri/telegram-business/state.db` (two tables: connections + drafts). Hermes' core state is never touched. Delete the file to reset.
 
 ## v1 limits
 
@@ -100,7 +100,7 @@ python3 -m pytest
 
 ## Credits
 
-Based on the design and implementation from [hermes-agent#30055](https://github.com/NousResearch/hermes-agent/pull/30055), replatformed as a standalone plugin. Related earlier community proposals: [#26654](https://github.com/NousResearch/hermes-agent/pull/26654) by @evgyur (earliest submission), [#35342](https://github.com/NousResearch/hermes-agent/pull/35342) by @MilekhinAV, [#46728](https://github.com/NousResearch/hermes-agent/pull/46728) by @kxnkxv.
+Based on the design and implementation from [Vetri#30055](https://github.com/pugazh342/Agent-Vetri/pull/30055), replatformed as a standalone plugin. Related earlier community proposals: [#26654](https://github.com/pugazh342/Agent-Vetri/pull/26654) by @evgyur (earliest submission), [#35342](https://github.com/pugazh342/Agent-Vetri/pull/35342) by @MilekhinAV, [#46728](https://github.com/pugazh342/Agent-Vetri/pull/46728) by @kxnkxv.
 
 ## License
 

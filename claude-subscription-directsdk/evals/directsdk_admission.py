@@ -98,7 +98,7 @@ def run(binary):
             peer.entered, peer.disconnected = threading.Event(), threading.Event()
             thread = threading.Thread(target=peer.serve_forever, daemon=True)
             thread.start()
-            env = {'PATH':os.defpath, 'HOME':home, 'HERMES_HOME':home, 'XDG_CONFIG_HOME':home, 'CLAUDE_CONFIG_DIR':home,
+            env = {'PATH':os.defpath, 'HOME':home, 'VETRI_HOME':home, 'XDG_CONFIG_HOME':home, 'CLAUDE_CONFIG_DIR':home,
                    'ANTHROPIC_API_KEY':'fixture-not-a-real-key', 'ANTHROPIC_BASE_URL':f'http://127.0.0.1:{peer.server_port}',
                    'DISABLE_TELEMETRY':'1', 'DISABLE_ERROR_REPORTING':'1'}
             client = directsdk.Client(command=binary, env=env, timeout=10)

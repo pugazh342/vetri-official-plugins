@@ -1,6 +1,6 @@
 """hermes-homeassistant — Home Assistant gateway platform + smart-home tools for Hermes Agent.
 
-Formerly built into hermes-agent core (``plugins/platforms/homeassistant`` and
+Formerly built into Vetri core (``plugins/platforms/homeassistant`` and
 ``tools/homeassistant_tool.py``). Everything a migrated install relies on is unchanged: platform name
 ``homeassistant``, toolset ``homeassistant``, tools ``ha_list_entities`` / ``ha_get_state`` /
 ``ha_list_services`` / ``ha_call_service``, env vars ``HASS_TOKEN`` / ``HASS_URL`` /

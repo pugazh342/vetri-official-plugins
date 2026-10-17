@@ -8,7 +8,7 @@ Standalone Hermes Agent model-provider plugin: `claude-subscription-directsdk-ex
 
 ## Requirements
 
-- Hermes Agent 0.21.4 or newer, or `main` at/after `118984d7a02f` (hermes-agent PR #117451, the core half of #105863). On an older Hermes the plugin fails to load with a clear `Failed to load user provider plugin` warning rather than half-working.
+- Hermes Agent 0.21.4 or newer, or `main` at/after `118984d7a02f` (Vetri PR #117451, the core half of #105863). On an older Hermes the plugin fails to load with a clear `Failed to load user provider plugin` warning rather than half-working.
 - Python 3.10+ on Linux, macOS or Windows. Native runs in its own process group (POSIX session / Windows `CREATE_NEW_PROCESS_GROUP`) and cancellation kills the whole tree (`killpg` / `taskkill /T`), so the `node` child behind the npm `claude.cmd` shim never outlives a cancelled request. The suite runs on all three in CI.
 - **The official Claude Code CLI, installed and logged in.** This plugin has no credentials of its own; everything goes through `claude`. Haiku 5.5 (the `haiku` alias) needs Claude Code **2.1.293** or newer, Sonnet 5.5 (the `sonnet` alias) needs **2.1.284** or newer and Opus 5.5 (the `opus` alias) needs **2.1.280** or newer; an older CLI answers `400 Claude Code … does not support this model`, so run `claude update` first ([model configuration](https://code.claude.com/docs/en/model-config#model-aliases)).
 
@@ -17,24 +17,24 @@ The plugin checks for `claude` at every seam and never guesses:
 | When | What happens without `claude` |
 | --- | --- |
 | plugin load | one warning in the log; the provider stays registered so setup can explain what is missing |
-| `hermes model` → this provider | the flow stops with the install hint and writes nothing to config |
+| `vetri model` → this provider | the flow stops with the install hint and writes nothing to config |
 | `/model`, Desktop/TUI picker | the pinned catalog is listed (no live account picker) |
 | a request | fails immediately with the install hint instead of a `Popen` traceback |
 
-Install Claude Code with `npm install -g @anthropic-ai/claude-code`. `claude` is looked up on `PATH`, then in the usual install directories (`~/.local/bin`, `~/.claude/local`, `~/bin`, `~/.npm-global/bin`, `~/.bun/bin`, `~/.volta/bin`, `/opt/homebrew/bin`, `/usr/local/bin`), so a backend started by a LaunchAgent or Hermes Desktop with a minimal `PATH` still finds it. Point `CLAUDE_SUBSCRIPTION_DIRECTSDK_COMMAND` at the binary if it lives anywhere else. The `plugin.yaml` declares the same requirement under `external_dependencies`.
+Install Claude Code with `npm install -g @anthropic-ai/claude-code`. `claude` is looked up on `PATH`, then in the usual install directories (`~/.local/bin`, `~/.claude/local`, `~/bin`, `~/.npm-global/bin`, `~/.bun/bin`, `~/.volta/bin`, `/opt/homebrew/bin`, `/usr/local/bin`), so a backend started by a LaunchAgent or Vetri Desktop with a minimal `PATH` still finds it. Point `CLAUDE_SUBSCRIPTION_DIRECTSDK_COMMAND` at the binary if it lives anywhere else. The `plugin.yaml` declares the same requirement under `external_dependencies`.
 
 ## Install
 
 ```sh
-hermes plugins install claude-subscription-directsdk      # from the Hermes plugin catalog (pinned, reviewed)
+vetri plugins install claude-subscription-directsdk      # from the Hermes plugin catalog (pinned, reviewed)
 # or straight from GitHub (tracks main):
-hermes plugins install NousResearch/hermes-official-plugins#claude-subscription-directsdk
+vetri plugins install pugazh342/vetri-official-plugins#claude-subscription-directsdk
 
 claude auth login
-hermes model          # pick "Claude Subscription DirectSDK (Experimental)"
+vetri model          # pick "Claude Subscription DirectSDK (Experimental)"
 ```
 
-Per-profile installs go under `~/.hermes/profiles/<profile>/plugins/` instead. The plugin declares `kind: model-provider`, so Hermes' provider discovery imports it directly; no `plugins.enabled` entry is needed.
+Per-profile installs go under `~/.vetri/profiles/<profile>/plugins/` instead. The plugin declares `kind: model-provider`, so Hermes' provider discovery imports it directly; no `plugins.enabled` entry is needed.
 
 ## Status
 
@@ -87,7 +87,7 @@ The relay opens the upstream connection itself, so it applies native's proxy var
 **Claude login config directory** (`claude_config_dir`, string, empty by default). Select a separately logged-in Claude config directory for the active Hermes profile, including profiles served by one multiplexed gateway:
 
 ```sh
-hermes config set plugins.entries.claude-subscription-directsdk-experimental.settings.claude_config_dir <dir>
+vetri config set plugins.entries.claude-subscription-directsdk-experimental.settings.claude_config_dir <dir>
 ```
 
 Read on every native spawn, including auth-status and model-discovery probes. Precedence: nonempty per-profile setting after trimming whitespace → nonempty `CLAUDE_SUBSCRIPTION_DIRECTSDK_CONFIG_DIR` → inherited `CLAUDE_CONFIG_DIR` → Claude CLI default. The selected value gets `~` expansion only; the plugin does not check whether the directory exists. An empty or whitespace-only setting falls through. A missing login produces the usual native authentication error. The process environment is never changed.
@@ -97,7 +97,7 @@ Read on every native spawn, including auth-status and model-discovery probes. Pr
 **Claude Code telemetry and feature flags** (`claude_code_telemetry`, on by default). Claude Code sends its usage telemetry and fetches feature flags; the flags are what unlock newer and older models in its model picker, so with them off the picker can shrink from every model your account runs to each family's current one (#86). Turn it off to keep Claude Code quiet: the plugin then starts it with `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`, `DISABLE_TELEMETRY` and `DISABLE_ERROR_REPORTING` set, and the pinned model table fills in the picker. Change it in the Desktop app under **Capabilities → Plugins**: the settings gear on the `claude-subscription-directsdk-experimental` row opens the switch. Or from the CLI:
 
 ```sh
-hermes config set plugins.entries.claude-subscription-directsdk-experimental.settings.claude_code_telemetry false
+vetri config set plugins.entries.claude-subscription-directsdk-experimental.settings.claude_code_telemetry false
 ```
 
 It is read for the active profile on every spawn, so it applies to the next request without a restart. Whatever the setting, the plugin never lets the CLI auto-update itself, use its feedback upload path or send its own session-title request (`DISABLE_AUTOUPDATER`, `DISABLE_FEEDBACK_COMMAND`, `CLAUDE_CODE_DISABLE_TERMINAL_TITLE`), and an opt-out you export yourself (`DISABLE_TELEMETRY`, `DO_NOT_TRACK`, ...) is passed through untouched.
@@ -148,7 +148,7 @@ providers:
     stale_timeout_seconds: 900
 ```
 
-## Setup: `hermes model` → Claude Subscription DirectSDK (Experimental)
+## Setup: `vetri model` → Claude Subscription DirectSDK (Experimental)
 
 Selecting the provider asks the Claude CLI itself, never Anthropic, before anything is saved:
 
@@ -204,8 +204,8 @@ Token usage retains native uncached/cache-read/cache-write/output components. Co
 ## Verification
 
 ```sh
-# HERMES_AGENT_REPO defaults to ~/.hermes/hermes-agent (a hermes-agent checkout supplies `providers`/`agent`)
-~/.hermes/hermes-agent/.venv/bin/python3 -m pytest tests/
+# HERMES_AGENT_REPO defaults to ~/.vetri/Vetri (a Vetri checkout supplies `providers`/`agent`)
+~/.vetri/Vetri/.venv/bin/python3 -m pytest tests/
 python evals/directsdk_admission.py /path/to/claude
 python evals/directsdk_cache_wire.py /path/to/claude
 ```
@@ -214,12 +214,12 @@ CI runs both evals on Linux and macOS through `evals/ci.sh`, against a pinned Cl
 
 Transport invariant tests cover signed replay and harmless normalization, transformed projections, final tool batches/usage, async use, lazy failure, invalid parameters, conflicting auth, and active/paused/unstarted stream cleanup. The admission regression fails on the previous implementation (two upstream requests) and passes with one request, preserving first-response usage including zero values. Its cancellation control verifies upstream socket closure. A real-native ten-case loopback qualification covers normal text, tools, output/context limits, thinking-only recovery, refusal, HTTP errors, disconnects and cancellation, with one upstream request per call. Its responses are synthetic protocol fixtures, not paid-model evidence.
 
-Installed-plugin discovery (`$HERMES_HOME/plugins/<name>/`) and every missing-`claude` path are covered against a temporary `HERMES_HOME`, including constructing the bundled client without spawning native or accessing auth. A fresh subscription-backed AIAgent loop completed two API calls with host `read_file` execution and SQLite persistence; separate service requests accepted edited-assistant replay. Native loopback qualification also accepted 182K of tool schemas plus a 176K system prompt through file-backed settings. Loopback responses remain fixtures, not paid-model evidence.
+Installed-plugin discovery (`$VETRI_HOME/plugins/<name>/`) and every missing-`claude` path are covered against a temporary `VETRI_HOME`, including constructing the bundled client without spawning native or accessing auth. A fresh subscription-backed AIAgent loop completed two API calls with host `read_file` execution and SQLite persistence; separate service requests accepted edited-assistant replay. Native loopback qualification also accepted 182K of tool schemas plus a 176K system prompt through file-backed settings. Loopback responses remain fixtures, not paid-model evidence.
 
 The subscription-backed task, CLI delegation, streaming, resume, denial, steering and interruption receipts are separate private artifacts. No auth data or trajectories are committed to this repository. Remaining qualification includes broader history transformations, cross-model signed replay, native versions/platforms, and adversarial steering reliability. Subscription invoice/overage reconciliation is not available from native list-price accounting.
 
 ## Attribution
 
-Extracted from hermes-agent PR #105863 (`feat: add Claude Subscription DirectSDK (Experimental) provider`) by @teknium1 and @unsupportedpastels. The provider-agnostic parts of that PR (external-process provider profiles, provider-native replay carriers, setup-flow gating, picker plumbing) land in Hermes core via hermes-agent PR #117451; the provider itself lives here as a standalone plugin because Hermes does not bundle vendor-specific subscription transports in-tree. The `claude` presence checks were added during extraction.
+Extracted from Vetri PR #105863 (`feat: add Claude Subscription DirectSDK (Experimental) provider`) by @teknium1 and @unsupportedpastels. The provider-agnostic parts of that PR (external-process provider profiles, provider-native replay carriers, setup-flow gating, picker plumbing) land in Hermes core via Vetri PR #117451; the provider itself lives here as a standalone plugin because Hermes does not bundle vendor-specific subscription transports in-tree. The `claude` presence checks were added during extraction.
 
 MIT licensed; see `LICENSE`.

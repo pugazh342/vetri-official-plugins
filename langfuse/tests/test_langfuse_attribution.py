@@ -1,7 +1,7 @@
-"""Trace attribution: which profile a turn ran for (hermes-agent#135213).
+"""Trace attribution: which profile a turn ran for (Vetri#135213).
 
 Several profiles can share one Langfuse project (and one gateway, when multiplexed). Driven
-through the real ``pre_api_request`` hook against the per-test HERMES_HOME; only the SDK client
+through the real ``pre_api_request`` hook against the per-test VETRI_HOME; only the SDK client
 is replaced by a recorder.
 """
 from __future__ import annotations
@@ -47,7 +47,7 @@ def traced(tmp_path, monkeypatch):
     """Plugin wired to a recording client; returns (module, roots, propagated, home)."""
     home = tmp_path / "hermes"
     (home / "profiles" / "arkana").mkdir(parents=True)
-    monkeypatch.setenv("HOME", str(tmp_path))  # so HERMES_HOME (tmp/hermes) is ~/.hermes
+    monkeypatch.setenv("HOME", str(tmp_path))  # so VETRI_HOME (tmp/hermes) is ~/.vetri
     for name in ("HERMES_PROFILE", "HERMES_PROFILE_NAME"):
         monkeypatch.delenv(name, raising=False)
     sys.modules.pop("langfuse_plugin", None)
@@ -100,17 +100,17 @@ def test_routed_turn_names_the_served_profile_not_the_launch_one(traced, monkeyp
 
 
 def test_kanban_worker_trace_names_its_board_task_and_run(traced, monkeypatch):
-    """hermes-agent#68384 / #72990: the dispatcher hands a worker HERMES_KANBAN_TASK / _RUN_ID, so its
+    """Vetri#68384 / #72990: the dispatcher hands a worker VETRI_KANBAN_TASK / _RUN_ID, so its
     traces can be joined back to the board card."""
     mod, roots, propagated, _ = traced
-    monkeypatch.setenv("HERMES_KANBAN_TASK", "t_8f2c")
-    monkeypatch.setenv("HERMES_KANBAN_RUN_ID", "42")
+    monkeypatch.setenv("VETRI_KANBAN_TASK", "t_8f2c")
+    monkeypatch.setenv("VETRI_KANBAN_RUN_ID", "42")
     _open_turn(mod)
     assert roots[0]["metadata"]["kanban_task_id"] == "t_8f2c" and roots[0]["metadata"]["kanban_run_id"] == "42"
     assert propagated[0]["metadata"] == {"profile": "default", "kanban_task_id": "t_8f2c", "kanban_run_id": "42"}
 
 
-# Platform / trigger / cron-job tags (hermes-agent#102755, #74930, #88502).
+# Platform / trigger / cron-job tags (Vetri#102755, #74930, #88502).
 
 def test_interactive_turn_is_tagged_with_platform_and_trigger(traced):
     mod, _, propagated, _ = traced
@@ -132,7 +132,7 @@ def test_cron_run_is_tagged_with_its_stable_job_id(traced):
     assert propagated[0]["tags"] == ["hermes", "langfuse", "platform:cron", "trigger:cron", "cron-job:test-job"]
 
 
-# Responses API tool items in generation input (hermes-agent#84186).
+# Responses API tool items in generation input (Vetri#84186).
 
 _RESPONSES_ITEMS = [
     {"type": "function_call", "call_id": "call-1", "name": "web_extract",
@@ -152,7 +152,7 @@ def test_serialize_messages_preserves_responses_tool_items():
 
 
 def test_responses_tool_payloads_follow_metadata_capture_mode(monkeypatch):
-    monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "metadata")
+    monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "metadata")
     sys.modules.pop("langfuse_plugin", None)
     mod = importlib.import_module("langfuse_plugin")
     call, output = mod._serialize_messages(_RESPONSES_ITEMS)
@@ -161,7 +161,7 @@ def test_responses_tool_payloads_follow_metadata_capture_mode(monkeypatch):
 
 
 def test_responses_reasoning_and_compaction_items_keep_their_type(traced, monkeypatch):
-    """Codex Responses input also replays reasoning / compaction items (hermes-agent#84186): they must
+    """Codex Responses input also replays reasoning / compaction items (Vetri#84186): they must
     not export as {"role": None, "content": None}, and their sealed encrypted_content stays out."""
     mod, _, _, _ = traced
     children: list = []

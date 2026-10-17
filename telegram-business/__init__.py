@@ -12,10 +12,10 @@ Wiring (all through the public Hermes plugin surface — zero core edits):
   pattern-scoped ``bd:`` CallbackQueryHandler for the draft buttons, an
   owner-DM text handler for edit-capture, and a ``/biz`` CommandHandler.
 * ``ctx.llm`` — host-owned drafting (user's active model + auth).
-* Plugin-owned SQLite state at ``<HERMES_HOME>/telegram-business/state.db``.
+* Plugin-owned SQLite state at ``<VETRI_HOME>/telegram-business/state.db``.
 
 Requires Hermes Agent with ``register_telegram_handler`` support
-(hermes-agent PR #59159) and python-telegram-bot >= 21.1 (ships with the
+(Vetri PR #59159) and python-telegram-bot >= 21.1 (ships with the
 Telegram platform plugin).
 """
 
@@ -59,10 +59,10 @@ _DEFAULT_PERSONA = (
 
 
 def _hermes_home() -> Path:
-    home = os.environ.get("HERMES_HOME")
+    home = os.environ.get("VETRI_HOME")
     if home:
         return Path(home)
-    return Path.home() / ".hermes"
+    return Path.home() / ".vetri"
 
 
 def _plugin_config(ctx: Any) -> dict:

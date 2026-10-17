@@ -1,7 +1,7 @@
 """Router tests for dashboard/plugin_api.py, driven through FastAPI's TestClient.
 
 Two layers: the router in isolation (mounted on a bare app at the host's prefix), and one
-end-to-end pass through the REAL Hermes web server — plugin copied into ``HERMES_HOME/plugins``,
+end-to-end pass through the REAL Hermes web server — plugin copied into ``VETRI_HOME/plugins``,
 enabled in config.yaml, discovered, API mounted, auth token required.
 """
 
@@ -109,7 +109,7 @@ def test_real_web_server_discovers_enables_and_mounts_the_plugin(hermes_home, mo
     (hermes_home / "config.yaml").write_text("plugins:\n  enabled:\n    - memory-wiki\n", encoding="utf-8")
     _seed_state_db(hermes_home)
     monkeypatch.setenv("HERMES_DASHBOARD_SESSION_TOKEN", "test-token")
-    # web_server discovers and mounts plugin APIs at import; make that import see this HERMES_HOME.
+    # web_server discovers and mounts plugin APIs at import; make that import see this VETRI_HOME.
     for name in [m for m in list(sys.modules) if m.startswith("hermes_cli.web_server") or m.startswith("hermes_cli.web_routers")]:
         sys.modules.pop(name, None)
     sys.modules.pop("hermes_dashboard_plugin_memory-wiki", None)

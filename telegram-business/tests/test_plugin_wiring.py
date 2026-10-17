@@ -25,7 +25,7 @@ def test_register_queues_one_factory():
 
 
 def test_factory_wires_handlers(tmp_path, monkeypatch):
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+    monkeypatch.setenv("VETRI_HOME", str(tmp_path))
     ctx = _FakeCtx()
     plugin.register(ctx)
     factory = ctx.factories[0]
@@ -47,5 +47,5 @@ def test_factory_wires_handlers(tmp_path, monkeypatch):
     ]
     assert -1 in groups
 
-    # Plugin state DB created under HERMES_HOME, not the core state.db.
+    # Plugin state DB created under VETRI_HOME, not the core state.db.
     assert (tmp_path / "telegram-business" / "state.db").exists()

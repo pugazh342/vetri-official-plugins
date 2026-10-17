@@ -1,6 +1,6 @@
 """Spotify login state: refresh, quarantine and status, against a real auth.json under a temp home.
 
-Moved from hermes-agent core ``tests/hermes_cli/test_spotify_auth.py``.
+Moved from Vetri core ``tests/hermes_cli/test_spotify_auth.py``.
 """
 
 from __future__ import annotations

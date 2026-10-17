@@ -1,7 +1,7 @@
-"""Test bootstrap: put the hermes-agent checkout on ``sys.path`` (for ``hermes_state`` /
+"""Test bootstrap: put the Vetri checkout on ``sys.path`` (for ``hermes_state`` /
 ``tools.memory_tool`` / FastAPI) and expose the plugin's modules by path.
 
-Set ``HERMES_AGENT_REPO`` to point at a checkout; defaults to ``~/.hermes/hermes-agent``.
+Set ``HERMES_AGENT_REPO`` to point at a checkout; defaults to ``~/.vetri/Vetri``.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent
 DASHBOARD_DIR = REPO_ROOT / "dashboard"
-HERMES_AGENT_REPO = Path(os.environ.get("HERMES_AGENT_REPO", Path.home() / ".hermes" / "hermes-agent"))
+HERMES_AGENT_REPO = Path(os.environ.get("HERMES_AGENT_REPO", Path.home() / ".vetri" / "Vetri"))
 
 if str(HERMES_AGENT_REPO) not in sys.path:
     sys.path.insert(0, str(HERMES_AGENT_REPO))
@@ -46,8 +46,8 @@ def plugin_api():
 
 @pytest.fixture
 def hermes_home(tmp_path, monkeypatch):
-    """Isolated HERMES_HOME so the plugin never reads the developer's real state.db / memories."""
+    """Isolated VETRI_HOME so the plugin never reads the developer's real state.db / memories."""
     home = tmp_path / "hermes-home"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("VETRI_HOME", str(home))
     return home

@@ -1,6 +1,6 @@
 """Spotify OAuth (loopback PKCE): login, refresh, runtime credentials, status and logout.
 
-Formerly ``hermes_cli/auth_spotify.py`` in hermes-agent core. Tokens stay where core kept them
+Formerly ``hermes_cli/auth_spotify.py`` in Vetri core. Tokens stay where core kept them
 (``providers.spotify`` in the profile's ``auth.json``, written under the auth-store lock), so an
 install that logged in while Spotify was built into core keeps its login, and other plugins that
 read that state (``spotify-desktop``) keep working.
@@ -23,7 +23,7 @@ PROVIDER = "spotify"
 DEFAULT_ACCOUNTS_BASE_URL = "https://accounts.spotify.com"
 DEFAULT_API_BASE_URL = "https://api.spotify.com/v1"
 DEFAULT_REDIRECT_URI = "http://127.0.0.1:43827/spotify/callback"
-DOCS_URL = "https://hermes-agent.nousresearch.com/docs/user-guide/features/spotify"
+DOCS_URL = "https://pugazh342.github.io/Agent-Vetri/docs/user-guide/features/spotify"
 DASHBOARD_URL = "https://developer.spotify.com/dashboard"
 ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 120
 DEFAULT_SCOPE = " ".join((
@@ -67,24 +67,24 @@ def _setting(
 
 
 def _client_id(explicit: Optional[str] = None, state: Optional[dict[str, Any]] = None) -> str:
-    client_id = _setting(state, "client_id", ("HERMES_SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_ID"), "", explicit=explicit)
+    client_id = _setting(state, "client_id", ("VETRI_SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_ID"), "", explicit=explicit)
     if client_id:
         return client_id
-    raise _err("Spotify client_id is required. Set HERMES_SPOTIFY_CLIENT_ID or pass --client-id.",
+    raise _err("Spotify client_id is required. Set VETRI_SPOTIFY_CLIENT_ID or pass --client-id.",
                "spotify_client_id_missing")
 
 
 def _redirect_uri(explicit: Optional[str] = None, state: Optional[dict[str, Any]] = None) -> str:
-    return _setting(state, "redirect_uri", ("HERMES_SPOTIFY_REDIRECT_URI", "SPOTIFY_REDIRECT_URI"),
+    return _setting(state, "redirect_uri", ("VETRI_SPOTIFY_REDIRECT_URI", "SPOTIFY_REDIRECT_URI"),
                     DEFAULT_REDIRECT_URI, explicit=explicit)
 
 
 def _api_base_url(state: Optional[dict[str, Any]] = None) -> str:
-    return _setting(state, "api_base_url", ("HERMES_SPOTIFY_API_BASE_URL",), DEFAULT_API_BASE_URL, strip_slash=True)
+    return _setting(state, "api_base_url", ("VETRI_SPOTIFY_API_BASE_URL",), DEFAULT_API_BASE_URL, strip_slash=True)
 
 
 def _accounts_base_url(state: Optional[dict[str, Any]] = None) -> str:
-    return _setting(state, "accounts_base_url", ("HERMES_SPOTIFY_ACCOUNTS_BASE_URL",), DEFAULT_ACCOUNTS_BASE_URL,
+    return _setting(state, "accounts_base_url", ("VETRI_SPOTIFY_ACCOUNTS_BASE_URL",), DEFAULT_ACCOUNTS_BASE_URL,
                     strip_slash=True)
 
 
@@ -281,7 +281,7 @@ def _interactive_setup(redirect_uri_hint: str) -> str:
         "Steps:\n"
         f"  1. Opening {DASHBOARD_URL} in your browser...\n"
         "  2. Click 'Create app' and fill in:\n"
-        "       App name:     anything (e.g. hermes-agent)\n"
+        "       App name:     anything (e.g. Vetri)\n"
         "       Description:  anything\n"
         f"       Redirect URI: {redirect_uri_hint}\n"
         "       API/SDK:      Web API\n"
@@ -304,10 +304,10 @@ def _interactive_setup(redirect_uri_hint: str) -> str:
         raise SystemExit("Spotify setup cancelled: empty Client ID.")
 
     # Persist so later runs skip the wizard; only pin a NON-default redirect URI.
-    save_env_value("HERMES_SPOTIFY_CLIENT_ID", raw)
+    save_env_value("VETRI_SPOTIFY_CLIENT_ID", raw)
     if redirect_uri_hint and redirect_uri_hint != DEFAULT_REDIRECT_URI:
-        save_env_value("HERMES_SPOTIFY_REDIRECT_URI", redirect_uri_hint)
-    print("\nSaved HERMES_SPOTIFY_CLIENT_ID to the profile's .env\n")
+        save_env_value("VETRI_SPOTIFY_REDIRECT_URI", redirect_uri_hint)
+    print("\nSaved VETRI_SPOTIFY_CLIENT_ID to the profile's .env\n")
     return raw
 
 
@@ -320,7 +320,7 @@ def login(args) -> None:
         _print_loopback_ssh_hint)
     existing_state = get_provider_auth_state(PROVIDER) or {}
 
-    # No client_id anywhere -> wizard instead of "HERMES_SPOTIFY_CLIENT_ID is required".
+    # No client_id anywhere -> wizard instead of "VETRI_SPOTIFY_CLIENT_ID is required".
     try:
         client_id = _client_id(getattr(args, "client_id", None), existing_state)
     except AuthError as exc:

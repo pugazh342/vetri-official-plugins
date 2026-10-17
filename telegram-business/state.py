@@ -1,7 +1,7 @@
 """Plugin-owned SQLite state for Telegram Business Mode.
 
 Two tables, both living in the plugin's own database file
-(``<HERMES_HOME>/telegram-business/state.db``) — the plugin never touches
+(``<VETRI_HOME>/telegram-business/state.db``) — the plugin never touches
 Hermes' core ``state.db`` schema:
 
   business_connections — one row per Telegram Business account that linked

@@ -1,5 +1,5 @@
 // src/plugin.tsx
-import { $accentOverride as $accentOverride2, PALETTE_AREA, setAccentOverride as setAccentOverride2, STATUSBAR_AREAS } from "@hermes/plugin-sdk";
+import { $accentOverride as $accentOverride2, PALETTE_AREA, setAccentOverride as setAccentOverride2, STATUSBAR_AREAS } from "@vetri/plugin-sdk";
 
 // src/picker.tsx
 import {
@@ -15,7 +15,7 @@ import {
   setAccentOverride,
   useTheme,
   useValue
-} from "@hermes/plugin-sdk";
+} from "@vetri/plugin-sdk";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
 var SWATCHES = [

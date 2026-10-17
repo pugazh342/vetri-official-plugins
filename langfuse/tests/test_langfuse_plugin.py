@@ -25,10 +25,10 @@ class TestDiscovery:
 
         from hermes_cli import plugins as plugins_mod
 
-        # Isolated HERMES_HOME so we don't read the developer's config.yaml.
+        # Isolated VETRI_HOME so we don't read the developer's config.yaml.
         home = tmp_path / ".hermes"
         home.mkdir()
-        monkeypatch.setenv("HERMES_HOME", str(home))
+        monkeypatch.setenv("VETRI_HOME", str(home))
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
         root = Path(__file__).resolve().parents[1]
         shutil.copytree(root, home / "plugins" / "langfuse", ignore=shutil.ignore_patterns("tests", "__pycache__"))
@@ -92,7 +92,7 @@ class TestRuntimeGate:
 
     def test_get_langfuse_returns_none_without_credentials(self, monkeypatch):
         for k in (
-            "HERMES_LANGFUSE_PUBLIC_KEY", "HERMES_LANGFUSE_SECRET_KEY",
+            "VETRI_LANGFUSE_PUBLIC_KEY", "VETRI_LANGFUSE_SECRET_KEY",
             "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
@@ -121,7 +121,7 @@ class TestHooksInert:
     def test_hooks_noop_without_client(self, monkeypatch):
         """All 6 hooks must return without raising when _get_langfuse() is None."""
         for k in (
-            "HERMES_LANGFUSE_PUBLIC_KEY", "HERMES_LANGFUSE_SECRET_KEY",
+            "VETRI_LANGFUSE_PUBLIC_KEY", "VETRI_LANGFUSE_SECRET_KEY",
             "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
         ):
             monkeypatch.delenv(k, raising=False)
@@ -343,7 +343,7 @@ class TestTurnTraceIsolation:
         assert surviving == list(range(42, 50))
 
     def test_a_turn_finished_on_another_thread_detaches_nothing(self, monkeypatch):
-        """Hermes fires a turn's pre and post hooks on different worker threads (hermes-agent#95057).
+        """Hermes fires a turn's pre and post hooks on different worker threads (Vetri#95057).
 
         The root used to be opened with ``start_as_current_observation(...).__enter__()``, which
         pushes an OTEL contextvars token, and exited later from ``_finish_trace`` on another thread,
@@ -402,7 +402,7 @@ class TestTurnTraceIsolation:
 # Placeholder-credential guard (#23823).
 #
 # Regression coverage for the silent-failure bug: when an operator leaves
-# HERMES_LANGFUSE_PUBLIC_KEY / SECRET_KEY at a template value like
+# VETRI_LANGFUSE_PUBLIC_KEY / SECRET_KEY at a template value like
 # "placeholder", "test-key", or "your-langfuse-key", the SDK accepts the
 # credentials at construction time (it does no server-side validation
 # eagerly) but drops every trace at flush time, with no signal in the
@@ -448,9 +448,9 @@ class TestPlaceholderKeyDetection:
     @staticmethod
     def _clear_env(monkeypatch):
         for k in (
-            "HERMES_LANGFUSE_PUBLIC_KEY", "HERMES_LANGFUSE_SECRET_KEY",
+            "VETRI_LANGFUSE_PUBLIC_KEY", "VETRI_LANGFUSE_SECRET_KEY",
             "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
-            "HERMES_LANGFUSE_BASE_URL", "LANGFUSE_BASE_URL",
+            "VETRI_LANGFUSE_BASE_URL", "LANGFUSE_BASE_URL",
         ):
             monkeypatch.delenv(k, raising=False)
 
@@ -462,20 +462,20 @@ class TestPlaceholderKeyDetection:
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
         assert plugin._validate_langfuse_key(
-            "HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz"
+            "VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz"
         ) is None
         assert plugin._validate_langfuse_key(
-            "HERMES_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz"
+            "VETRI_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz"
         ) is None
 
     @pytest.mark.parametrize(("env_name", "value"), [
-        ("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-..."), ("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-***"),
-        ("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-"), ("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-PLACEHOLDER"),
-        ("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-your-secret-key"), ("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-xxxxxxxx"),
+        ("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-..."), ("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-***"),
+        ("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-"), ("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-PLACEHOLDER"),
+        ("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-your-secret-key"), ("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-xxxxxxxx"),
     ])
     def test_validate_langfuse_key_rejects_right_prefix_templates(self, monkeypatch, env_name, value):
         """The docs' own ``pk-lf-...`` passes a prefix-only check and then drops every
-        trace at flush time (hermes-agent#51399)."""
+        trace at flush time (Vetri#51399)."""
         self._clear_env(monkeypatch)
         msg = self._fresh_plugin()._validate_langfuse_key(env_name, value)
         assert msg is not None and env_name in msg and "template" in msg
@@ -484,8 +484,8 @@ class TestPlaceholderKeyDetection:
         """Issued remainders are hex + dashes; no template fragment can match them."""
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
-        assert plugin._validate_langfuse_key("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-1234abcd-12ab-4cd9-9f00-aabbccddeeff") is None
-        assert plugin._validate_langfuse_key("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-9f8e7d6c-5b4a-4321-8765-0123456789ab") is None
+        assert plugin._validate_langfuse_key("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-1234abcd-12ab-4cd9-9f00-aabbccddeeff") is None
+        assert plugin._validate_langfuse_key("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-9f8e7d6c-5b4a-4321-8765-0123456789ab") is None
 
 
     # -- end-to-end _get_langfuse() behaviour --------------------------------
@@ -496,13 +496,13 @@ class TestPlaceholderKeyDetection:
 
     def test_placeholder_public_key_warns_and_skips(self, monkeypatch, caplog):
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "placeholder")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "placeholder")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
         text = caplog.text
-        assert "HERMES_LANGFUSE_PUBLIC_KEY" in text
+        assert "VETRI_LANGFUSE_PUBLIC_KEY" in text
         assert "'placeholder'" in text
         assert "pk-lf-" in text
         # The valid secret value must NOT appear (the var NAME does, in
@@ -513,13 +513,13 @@ class TestPlaceholderKeyDetection:
 
     def test_placeholder_secret_key_warns_and_skips(self, monkeypatch, caplog):
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "test-key")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "test-key")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
         text = caplog.text
-        assert "HERMES_LANGFUSE_SECRET_KEY" in text
+        assert "VETRI_LANGFUSE_SECRET_KEY" in text
         assert "'test-key'" in text
         assert "sk-lf-" in text
         # The valid public value must NOT appear.
@@ -528,8 +528,8 @@ class TestPlaceholderKeyDetection:
 
     def test_both_placeholders_one_warning_with_both_keys(self, monkeypatch, caplog):
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "placeholder")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "placeholder")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "placeholder")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "placeholder")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
@@ -540,8 +540,8 @@ class TestPlaceholderKeyDetection:
             + "\n".join(r.getMessage() for r in warnings)
         )
         text = warnings[0].getMessage()
-        assert "HERMES_LANGFUSE_PUBLIC_KEY" in text
-        assert "HERMES_LANGFUSE_SECRET_KEY" in text
+        assert "VETRI_LANGFUSE_PUBLIC_KEY" in text
+        assert "VETRI_LANGFUSE_SECRET_KEY" in text
 
     def test_repeated_calls_do_not_re_warn(self, monkeypatch, caplog):
         """The cached ``_INIT_FAILED`` sentinel must short-circuit
@@ -549,8 +549,8 @@ class TestPlaceholderKeyDetection:
         line — otherwise a busy gateway will spam the operator's
         terminal."""
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "placeholder")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "placeholder")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "placeholder")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "placeholder")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             for _ in range(15):
@@ -568,13 +568,13 @@ class TestPlaceholderKeyDetection:
     ])
     def test_custom_endpoint_builds_but_warns_on_wrong_prefix(self, monkeypatch, caplog, public, secret):
         """A custom Langfuse-compatible endpoint may issue keys without the Cloud prefix and
-        authenticates them itself (hermes-agent#72484), so the client is built. Self-hosted
+        authenticates them itself (Vetri#72484), so the client is built. Self-hosted
         Langfuse issues pk-lf-/sk-lf- keys too, so a wrong prefix (the `ollama` / `sk-...` /
-        swapped keys of hermes-agent#51399) still warns once instead of dying silently at flush."""
+        swapped keys of Vetri#51399) still warns once instead of dying silently at flush."""
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_BASE_URL", "https://langfuse.mycorp.example")
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", public)
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", secret)
+        monkeypatch.setenv("VETRI_LANGFUSE_BASE_URL", "https://langfuse.mycorp.example")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", public)
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", secret)
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             for _ in range(3):
@@ -586,9 +586,9 @@ class TestPlaceholderKeyDetection:
 
     def test_custom_endpoint_still_refuses_template_keys(self, monkeypatch, caplog):
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_BASE_URL", "https://langfuse.mycorp.example")
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-...")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-1234abcd-12ab")
+        monkeypatch.setenv("VETRI_LANGFUSE_BASE_URL", "https://langfuse.mycorp.example")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-...")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-1234abcd-12ab")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             assert plugin._get_langfuse() is None
@@ -602,34 +602,34 @@ class TestPlaceholderKeyDetection:
     ])
     def test_prefix_guard_scoped_to_langfuse_cloud_hosts(self, monkeypatch, base_url, guarded):
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_BASE_URL", base_url)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "custom-public-key")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "custom-secret-key")
+        monkeypatch.setenv("VETRI_LANGFUSE_BASE_URL", base_url)
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "custom-public-key")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "custom-secret-key")
         assert (self._fresh_plugin(monkeypatch)._get_langfuse() is None) is guarded
 
     def test_missing_secret_key_warns_once_and_skips(self, monkeypatch, caplog):
         """Placeholder public key + unset secret used to fail with zero log output
-        (hermes-agent#98631): the empty branch runs before the placeholder guard."""
+        (Vetri#98631): the empty branch runs before the placeholder guard."""
         self._clear_env(monkeypatch)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "your-public-key-here")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "your-public-key-here")
         plugin = self._fresh_plugin(monkeypatch)
         with caplog.at_level(logging.WARNING, logger=self.LOGGER_NAME):
             for _ in range(3):
                 assert plugin._get_langfuse() is None
         warnings = [r.getMessage() for r in caplog.records if r.name == self.LOGGER_NAME]
         assert len(warnings) == 1
-        assert "missing credentials (HERMES_LANGFUSE_SECRET_KEY)" in warnings[0]
+        assert "missing credentials (VETRI_LANGFUSE_SECRET_KEY)" in warnings[0]
         assert "traces will NOT be emitted" in warnings[0]
         assert _FakeLangfuse.instances == []
 
     @pytest.mark.parametrize(("service_name", "resource_attrs", "expected"), [
-        (None, "", "hermes-agent"), (None, "service.name=my-agent", None), ("my-agent", "", "my-agent"),
+        (None, "", "Vetri"), (None, "service.name=my-agent", None), ("my-agent", "", "my-agent"),
     ])
     def test_client_build_defaults_otel_service_name(self, monkeypatch, service_name, resource_attrs, expected):
         """Without it the SDK's OTel resource exports service.name=unknown_service
-        (hermes-agent#58322); an operator-set service.name must not be overridden. The SDK's
+        (Vetri#58322); an operator-set service.name must not be overridden. The SDK's
         TracerProvider reads the env once, in Langfuse(); the default must not outlive that call,
-        or every terminal-tool command and MCP server inherits OTEL_SERVICE_NAME=hermes-agent."""
+        or every terminal-tool command and MCP server inherits OTEL_SERVICE_NAME=Vetri."""
         import os
         self._clear_env(monkeypatch)
         monkeypatch.setenv("OTEL_SERVICE_NAME", "restore-me")  # so teardown undoes any leak
@@ -637,8 +637,8 @@ class TestPlaceholderKeyDetection:
         if service_name:
             monkeypatch.setenv("OTEL_SERVICE_NAME", service_name)
         monkeypatch.setenv("OTEL_RESOURCE_ATTRIBUTES", resource_attrs)
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz")
         plugin = self._fresh_plugin(monkeypatch)
         seen = []
         monkeypatch.setattr(plugin, "Langfuse", lambda **kw: seen.append(os.environ.get("OTEL_SERVICE_NAME")) or _FakeLangfuse(**kw))
@@ -1205,7 +1205,7 @@ class TestCostTotal:
 
 
 # ---------------------------------------------------------------------------
-# Capture modes: metadata | sanitized | full  (HERMES_LANGFUSE_CAPTURE)
+# Capture modes: metadata | sanitized | full  (VETRI_LANGFUSE_CAPTURE)
 # ---------------------------------------------------------------------------
 
 class TestCaptureModes:
@@ -1215,21 +1215,21 @@ class TestCaptureModes:
 
     def test_default_mode_is_sanitized(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.delenv("HERMES_LANGFUSE_CAPTURE", raising=False)
+        monkeypatch.delenv("VETRI_LANGFUSE_CAPTURE", raising=False)
         assert mod._capture_mode() == "sanitized"
 
     def test_invalid_mode_falls_back_and_warns_once(self, monkeypatch, caplog):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "everything")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "everything")
         with caplog.at_level(logging.WARNING):
             assert mod._capture_mode() == "sanitized"
             assert mod._capture_mode() == "sanitized"
-        warnings = [r for r in caplog.records if "HERMES_LANGFUSE_CAPTURE" in r.getMessage()]
+        warnings = [r for r in caplog.records if "VETRI_LANGFUSE_CAPTURE" in r.getMessage()]
         assert len(warnings) == 1
 
     def test_metadata_mode_omits_content(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "metadata")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "metadata")
         out = mod._capture_content("top secret prompt text")
         assert out == {"omitted": True, "type": "text", "chars": 22}
         obj = mod._capture_content({"password": "hunter22", "path": "/x"})
@@ -1239,7 +1239,7 @@ class TestCaptureModes:
 
     def test_metadata_mode_message_serialization_keeps_roles(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "metadata")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "metadata")
         msgs = mod._serialize_messages([
             {"role": "user", "content": "my ssn is 123-45-6789"},
             {"role": "assistant", "content": "noted"},
@@ -1250,7 +1250,7 @@ class TestCaptureModes:
 
     def test_sanitized_mode_redacts_secrets(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         samples = {
             "openai": "here sk-" + "a" * 20 + " done",
             "anthropic": "key sk-ant-" + "a" * 20 + " x",
@@ -1269,7 +1269,7 @@ class TestCaptureModes:
 
     def test_sanitized_mode_redacts_before_truncation(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         secret = "sk-" + "z" * 40
         text = "x" * 100 + " " + secret + " " + "y" * 100
         out = mod._truncate_text(text, 120)
@@ -1278,13 +1278,13 @@ class TestCaptureModes:
 
     def test_sanitized_mode_keeps_ordinary_text(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         text = "refactor the memory manager to emit spans"
         assert mod._capture_content(text) == text
 
     def test_full_mode_keeps_secret_shaped_text(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "full")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "full")
         text = "here sk-abcdefghijklmnop1234 done"
         assert mod._capture_content(text) == text
 
@@ -1295,16 +1295,16 @@ class TestCaptureModes:
         token = "opaqTok-" + "7Qm2Xv9LkP4zR8wN1bY6"  # opaque: no vendor prefix for the text redactor
         inner = {"access_token": token, "username": "alice", "nested": [{"password": "hunter2"}], "total_tokens": "70"}
         result = json.dumps({"output": json.dumps(inner), "exit_code": 0})
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         out = mod._capture_content(result, tool_result_of=("terminal", {}))["output"]
         assert out == {"access_token": "[REDACTED]", "username": "alice", "nested": [{"password": "[REDACTED]"}],
                        "total_tokens": "70"}
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "full")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "full")
         assert mod._capture_content(result, tool_result_of=("terminal", {}))["output"] == inner
 
     def test_sanitized_mode_masks_bare_bearer_token(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         out = mod._capture_content("call it with Bearer 9f8e7d6c5b4a39281706f5e4d3c2b1a0ffee please")
         assert "9f8e7d6c5b4a" not in out
 
@@ -1322,20 +1322,20 @@ class TestCaptureModes:
 
     def test_sanitized_mode_masks_url_credentials_in_content(self, monkeypatch):
         """Core's default leaves user:pass@ and ?api_key= in URLs alone (OAuth callbacks must
-        survive tool flows); a telemetry upload has no such need (hermes-agent#88608)."""
+        survive tool flows); a telemetry upload has no such need (Vetri#88608)."""
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         text = "cloning https://bob:hunter2pass@git.internal/x.git via https://api.example/v1?api_key=opaq7Qm2Xv9LkP4zR8wN&q=1"
         out = self._exported_tool_output(mod, monkeypatch, json.dumps({"output": text, "exit_code": 0}))["output"]
         assert "hunter2pass" not in out and "opaq7Qm2Xv9LkP4zR8wN" not in out and "bob:" not in out, out
         assert "git.internal/x.git" in out and "q=1" in out
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "full")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "full")
         assert self._exported_tool_output(mod, monkeypatch, json.dumps({"output": text}))["output"] == text
 
     def test_sanitized_mode_masks_numeric_secret_fields(self, monkeypatch):
         """JSON parsing turns a numeric password into an int, which the str-only key mask skipped."""
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "sanitized")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "sanitized")
         inner = {"password": 123456, "api_key": 9.5, "token": True, "secret": None, "total_tokens": 70, "port": 5432}
         out = self._exported_tool_output(mod, monkeypatch, json.dumps({"output": json.dumps(inner)}))["output"]
         assert out == {"password": "[REDACTED]", "api_key": "[REDACTED]", "token": True, "secret": None,
@@ -1430,7 +1430,7 @@ class TestApiRequestErrorHook:
 
     def test_error_message_respects_capture_mode(self, monkeypatch):
         mod = self._fresh_plugin()
-        monkeypatch.setenv("HERMES_LANGFUSE_CAPTURE", "metadata")
+        monkeypatch.setenv("VETRI_LANGFUSE_CAPTURE", "metadata")
         monkeypatch.setattr(mod, "_get_langfuse", lambda: object())
         mod._TRACE_STATE.clear()
         turn_id = "s:t:turn3"
@@ -1860,7 +1860,7 @@ class TestMoAReferenceGenerations:
         assert gens == []
 
 class TestAtexitFinalization(TestTurnTraceIsolation):
-    """Short-lived processes (kanban workers, `hermes chat -q`, cron) can exit
+    """Short-lived processes (kanban workers, `vetri chat -q`, cron) can exit
     with tool calls still queued — the root span never ends and the backend
     shows an anonymous trace (no name/session/metadata). _finalize_all_traces
     (registered atexit after client construction) must end every open root."""
@@ -1903,8 +1903,8 @@ class TestAtexitFinalization(TestTurnTraceIsolation):
         monkeypatch.setattr(
             _atexit, "register", lambda fn, *a, **k: registered.append(fn)
         )
-        monkeypatch.setenv("HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-0123456789abcdef")
-        monkeypatch.setenv("HERMES_LANGFUSE_SECRET_KEY", "sk-lf-0123456789abcdef")
+        monkeypatch.setenv("VETRI_LANGFUSE_PUBLIC_KEY", "pk-lf-0123456789abcdef")
+        monkeypatch.setenv("VETRI_LANGFUSE_SECRET_KEY", "sk-lf-0123456789abcdef")
         mod._LANGFUSE_CLIENT = None
 
         assert mod._get_langfuse() is not None
@@ -1941,8 +1941,8 @@ class TestAtexitFinalization(TestTurnTraceIsolation):
             home.mkdir()
             home_token = set_hermes_home_override(home)
             scope_token = secret_scope.set_secret_scope({
-                "HERMES_LANGFUSE_PUBLIC_KEY": f"pk-lf-{profile}-0123456789",
-                "HERMES_LANGFUSE_SECRET_KEY": f"sk-lf-{profile}-0123456789",
+                "VETRI_LANGFUSE_PUBLIC_KEY": f"pk-lf-{profile}-0123456789",
+                "VETRI_LANGFUSE_SECRET_KEY": f"sk-lf-{profile}-0123456789",
             })
             try:
                 self._run_turn(mod, session=f"{profile}-turn", turn_n=0, finalize=False)
@@ -2185,7 +2185,7 @@ class TestFinishTraceUsesSetTraceIo:
 
     Calling the missing method once skipped root_span.end() (blank Input/Output
     columns, no CHAIN root); after that was guarded it still failed open on every
-    turn, so traces shipped without trace-level input/output (hermes-agent#94710).
+    turn, so traces shipped without trace-level input/output (Vetri#94710).
     """
 
     def test_finish_ends_root_and_calls_set_trace_io(self, monkeypatch):
@@ -2584,7 +2584,7 @@ class TestCanonicalCostExport:
 
 class TestChildObservationsInheritTraceAttributes:
     def test_children_are_created_inside_the_roots_propagate_attributes(self, monkeypatch):
-        """hermes-agent#81730: propagate_attributes() only stamps observations created inside its
+        """Vetri#81730: propagate_attributes() only stamps observations created inside its
         scope. Children come from later hooks, after the root's ``with`` block closed, so they used
         to carry no session_id/tags. Every child must be opened under the root's attributes."""
         import contextlib

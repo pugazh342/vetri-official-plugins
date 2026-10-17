@@ -1,4 +1,4 @@
-/* hermes-memory-wiki dashboard bundle — built from dashboard/src/index.jsx with esbuild; edit the source, run npm run build. MIT, (c) 2026 Nous Research; original by @Araja119 (hermes-agent #31244). */
+/* hermes-memory-wiki dashboard bundle — built from dashboard/src/index.jsx with esbuild; edit the source, run npm run build. MIT, (c) 2026 Nous Research; original by @Araja119 (Vetri #31244). */
 (() => {
   // dashboard/src/index.jsx
   var SDK = window.__HERMES_PLUGIN_SDK__;

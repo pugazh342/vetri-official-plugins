@@ -1,6 +1,6 @@
 """Spotify Web API client: 401 retry, empty-204 payloads, URI normalisation, auth error wrapping.
 
-Moved from hermes-agent core ``tests/tools/test_spotify_client.py``.
+Moved from Vetri core ``tests/tools/test_spotify_client.py``.
 """
 
 from __future__ import annotations
